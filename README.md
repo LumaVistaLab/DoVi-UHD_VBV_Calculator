@@ -1,4 +1,4 @@
-# DoVi UHD VBV Calculator
+# Dolby Vision UHD Blu-ray VBV Parameters Calculator
 
 面向 UHD Blu-ray / Dolby Vision Profile 7 工作流的 VBV 参数计算与工程规则整理仓库。项目核心是一个 Windows 批处理计算器，用于根据 `VBV_safeRate` 和增强层类型（MEL / FEL）生成 BL/EL 的 `max_vbv_data_rate` 与 `vbv_buffer_size` 分配参数，并配套保存了规则说明、示例日志和一份完整的编码参数优化指南。
 
