@@ -1,0 +1,67 @@
+1 GB = 1,000 MB = 1,000,000 KB = 1,000,000,000 Bytes
+1 Mbps = 1,000 Kbps = 1,000,000 bit/s
+
+----------------------------------------------------------------
+
+BD-ROM 66G (122.546 Mbps): 63,644.00 MB, M2TS_maxRate = 109 Mbps
+BD-ROM 66G (two zoned disc): 58,552.48 MB, M2TS_maxRate = 127.9 Mbps
+BD-ROM 100G (122.546 Mbps): 95,466.00 MB, M2TS_maxRate = 109 Mbps
+BD-ROM 100G (two zoned disc): 87,828.72 MB, M2TS_maxRate = 127.9 Mbps
+
+---------------------------------------------------------------------
+
+VBV_peakRate = VBV_maxRate + VBV_bufferSize
+VBV_peakRate + 2 * VBV_maxRate = 3 * VBV_safeRate
+VBV_buffSize = VBV_buffRatio * VBV_maxRate
+VBV_maxRate = VBV_safeRatio * VBV_safeRate
+
+VBV_buffRatio = 1/3
+VBV_safeRatio = 0.9
+
+VBV_safeRate = Z1 (Mbps)
+
+--------------------------------------
+
+VBV_bitRate = BL_bitRate + MEL_bitRate
+VBV_maxRate = BL_maxRate + MEL_maxRate
+VBV_buffSize = BL_buffSize + MEL_buffSize
+VBV_peakRate = BL_peakRate + MEL_peakRate
+VBV_safeRate = BL_safeRate + MEL_safeRate
+
+VBV_bitRate = BL_bitRate + FEL_bitRate
+VBV_maxRate = BL_maxRate + FEL_maxRate
+VBV_buffSize = BL_buffSize + FEL_buffSize
+VBV_peakRate = BL_peakRate + FEL_peakRate
+VBV_safeRate = BL_safeRate + FEL_safeRate
+
+BL_bitRate = BL_MEL_ratio * MEL_bitRate
+BL_maxRate = BL_MEL_ratio * MEL_maxRate
+BL_buffSize = BL_MEL_ratio * MEL_buffSize
+BL_peakRate = BL_MEL_ratio * MEL_peakRate
+BL_safeRate = BL_MEL_ratio * MEL_safeRate
+
+BL_bitRate = BL_FEL_ratio * FEL_bitRate
+BL_maxRate = BL_FEL_ratio * FEL_maxRate
+BL_buffSize = BL_FEL_ratio * FEL_buffSize
+BL_peakRate = BL_FEL_ratio * FEL_peakRate
+BL_safeRate = BL_FEL_ratio * FEL_safeRate
+
+BL_MEL_ratio = 98%/2% OR 98.5%/1.5% OR 99%/1% OR 99.5%/0.5%
+BL_FEL_ratio = Z2%/Z3%, 80% <= Z2% <= 95%, Z2% + Z3% = 100%
+
+BL_bitRate <= BL_maxRate <= 100,000 Kbps (1)
+MEL_bitRate <= MEL_maxRate <= 100,000 (Kbps)
+FEL_bitRate <= FEL_maxRate <= 100,000 (Kbps)
+
+-----------------------------------------------------------------
+
+BL_MEL_ratio* = max{BL_maxRate | BL_maxRate = Z4 (Kbps), (1)} (2)
+BL_FEL_ratio* = min{BL_FEL_ratio | BL_maxRate = Z5 (Kbps), (1)} (3)
+
+ELSE
+
+VBV_safeRate* = max{VBV_safeRate | ∃ BL_MEL_ratio, (2)}
+VBV_safeRate* = max{VBV_safeRate | ∃ BL_FEL_ratio, (3)}
+
+BL_MEL_ratio* = max{BL_maxRate | BL_maxRate = Z4 (Kbps), (1)}
+BL_FEL_ratio* = min{BL_FEL_ratio | BL_maxRate = Z5 (Kbps), (1)}

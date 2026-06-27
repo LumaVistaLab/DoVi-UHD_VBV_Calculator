@@ -1,0 +1,630 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UHD Blu-ray Encoding Parameter Optimization Guide</title>
+  <style>
+    :root {
+      --ink: #172033;
+      --muted: #5f6b7a;
+      --line: #d6dce5;
+      --panel: #f6f8fb;
+      --panel2: #eef3f8;
+      --accent: #123c69;
+      --accent2: #315f8f;
+      --ok: #11623c;
+      --warn: #8a5a00;
+      --danger: #8a1f1f;
+      --code: #0d1b2a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", Arial, sans-serif;
+      color: var(--ink);
+      background: #eef1f5;
+      line-height: 1.65;
+      padding: 14mm 0;
+    }
+    .page {
+      width: 297mm;
+      min-height: 420mm;
+      margin: 0 auto;
+      padding: 16mm;
+      background: #ffffff;
+      border: 1px solid #c7cfdb;
+      box-shadow: 0 18px 46px rgba(25, 37, 55, .18);
+    }
+    header {
+      border-bottom: 3px solid var(--accent);
+      padding-bottom: 22px;
+      margin-bottom: 34px;
+    }
+    .kicker {
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    h1 {
+      font-size: 34px;
+      line-height: 1.18;
+      margin: 8px 0 12px;
+    }
+    h2 {
+      font-size: 24px;
+      margin: 36px 0 14px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--line);
+    }
+    h3 {
+      font-size: 19px;
+      margin: 26px 0 10px;
+    }
+    p { margin: 10px 0; }
+    p, li, td {
+      word-break: normal;
+      overflow-wrap: break-word;
+      line-break: strict;
+      text-wrap: pretty;
+      orphans: 2;
+      widows: 2;
+    }
+    .keep { white-space: nowrap; }
+    .meta, .note, .source-note { color: var(--muted); }
+    .summary {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--accent);
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin: 18px 0 28px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin: 16px 0;
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 16px 18px;
+    }
+    .card h3 { margin-top: 0; }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 14px 0 22px;
+      font-size: 13.6px;
+    }
+    th, td {
+      border: 1px solid var(--line);
+      padding: 9px 10px;
+      vertical-align: top;
+    }
+    th {
+      background: var(--panel2);
+      text-align: left;
+      font-weight: 700;
+    }
+    tr:nth-child(even) td { background: #fbfcfe; }
+
+    th:nth-child(3), td:nth-child(3) {
+      overflow-wrap: break-word;
+      word-break: normal;
+      min-width: 0;
+    }
+    .audio-table .rate { overflow-wrap: break-word; }
+    .audio-table {
+      table-layout: fixed;
+      font-size: 12.9px;
+      line-height: 1.4;
+    }
+    .audio-table th, .audio-table td {
+      word-break: normal;
+      overflow-wrap: break-word;
+      hyphens: none;
+      text-wrap: pretty;
+    }
+    .audio-table .stream { width: 26%; }
+    .audio-table .config { width: 44%; }
+    .audio-table .rate { width: 30%; }
+    .rules-table {
+      table-layout: fixed;
+      font-size: 13.3px;
+      line-height: 1.45;
+    }
+    .rules-table .rule { width: 23%; }
+    .rules-table .method { width: 44%; }
+    .rules-table .reason { width: 33%; }
+    .rules-table th, .rules-table td {
+      word-break: normal;
+      overflow-wrap: break-word;
+      line-break: strict;
+    }
+    .nowrap { white-space: nowrap; }
+    .term { white-space: nowrap; }
+    .table-note {
+      margin-top: -12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    code, pre {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+    }
+    td code, th code { white-space: normal; }
+    code {
+      background: #eef2f6;
+      padding: 1px 5px;
+      border-radius: 4px;
+    }
+    pre {
+      background: var(--code);
+      color: #eef5ff;
+      padding: 16px 18px;
+      border-radius: 8px;
+      overflow-x: auto;
+      line-height: 1.5;
+      font-size: 13px;
+    }
+    .formula {
+      background: #f8fafc;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin: 12px 0;
+    }
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 700;
+      background: #e8eef6;
+      color: var(--accent);
+      margin-right: 6px;
+    }
+    .ok { color: var(--ok); font-weight: 700; }
+    .warn { color: var(--warn); font-weight: 700; }
+    .danger { color: var(--danger); font-weight: 700; }
+    ul, ol { padding-left: 24px; }
+    li { margin: 6px 0; }
+    .toc {
+      background: #ffffff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px 18px;
+    }
+    .toc a { color: var(--accent); text-decoration: none; }
+    .toc a:hover, .toc a:focus { color: var(--accent2); text-decoration: none; }
+    a { color: var(--accent2); }
+    .small { font-size: 13px; }
+    .footer {
+      border-top: 1px solid var(--line);
+      margin-top: 38px;
+      padding-top: 18px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    @page {
+      size: A3 portrait;
+      margin: 16mm;
+    }
+    @media (max-width: 900px) {
+      body { padding: 0; background: #ffffff; }
+      .grid { grid-template-columns: 1fr; }
+      h1 { font-size: 28px; }
+      .page {
+        width: 100%;
+        min-height: auto;
+        padding: 28px 16px 56px;
+        border: 0;
+        box-shadow: none;
+      }
+    }
+    @media print {
+      html, body {
+        width: 297mm;
+        margin: 0;
+        padding: 0;
+        background: #fff;
+      }
+      body {
+        color: #000;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .page {
+        width: 265mm;
+        max-width: 265mm;
+        min-height: auto;
+        margin: 0 auto;
+        padding: 0;
+        border: 0;
+        box-shadow: none;
+      }
+      header { break-after: avoid; }
+      h2, h3 { break-after: avoid; page-break-after: avoid; }
+      table, pre, .toc, .summary, .card, .formula {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+      table { font-size: 13px; }
+      th, td { padding: 7px 8px; }
+      .audio-table { font-size: 12.1px; line-height: 1.34; }
+      .audio-table th, .audio-table td { padding: 6px 7px; }
+      .rules-table { font-size: 12.4px; line-height: 1.36; }
+      .rules-table th, .rules-table td { padding: 6px 7px; }
+      a { color: #000; text-decoration: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header>
+      <div class="kicker">Engineering Guide</div>
+      <h1>UHD 蓝光编码参数优化指南</h1>
+      <p class="meta">副标题：在 Scenarist UHD MUX 不出现 <code>buffer_underflows</code> 的前提下，最大化利用不同 UHD 碟片的 M2TS 传输速率</p>
+      <p class="meta">文件名：<strong>UHD_BluRay_Encoding_Parameter_Optimization_Guide.html</strong> ｜ 生成日期：2026-06-27</p>
+    </header>
+
+    <section class="summary" id="executive-summary">
+      <h2 style="margin-top:0">0. 核心结论</h2>
+      <p>你的方法可以概括为：<strong>先用理论约束确定安全外包络，再用多轮 Scenarist UHD MUX 实验把外包络收敛为生产参数</strong>。关键不是把编码器瞬时峰值直接推到碟片 M2TS 极限，而是把 <code>M2TS_maxRate</code> 拆成“音频最大占用 + 视频安全预算 + 极小校验余量”，再用固定的 VBV 安全模型把视频预算转换为 BL/EL 的 <code>max_vbv_data_rate</code>、<code>vbv_buffer_size</code> 和平均 <code>data_rate</code>。</p>
+      <p>最终形成了两个互补配置：<strong>MEL 单碟发行版</strong>利用 BD-ROM 100GB 的容量，以 109 Mbps M2TS 上限为外约束，将视频安全预算锁定为 96 Mbps；<strong>FEL 三碟测试版</strong>利用 two-zoned 66GB 的 127.9 Mbps HTR 传输能力，为大量音频轨和 FEL 残差层腾出传输预算，同时仍把视频安全预算固定在 96 Mbps，避免 MUX 端发生读缓冲欠载。</p>
+    </section>
+
+    <nav class="toc" aria-label="Table of contents">
+      <strong>目录</strong>
+      <ol>
+        <li><a href="#constraints">理论约束</a></li>
+        <li><a href="#vbv-model">VBV 安全模型</a></li>
+        <li><a href="#workflow">工程化优化流程</a></li>
+        <li><a href="#audio-streams">音频流信息与复用预算</a></li>
+        <li><a href="#mel-case">MEL 单碟发行版</a></li>
+        <li><a href="#fel-case">FEL 三碟测试版</a></li>
+        <li><a href="#practice-rules">生产实践规则</a></li>
+        <li><a href="#qc">验证与 QC 清单</a></li>
+        <li><a href="#references">参考文献</a></li>
+      </ol>
+    </nav>
+
+    <section id="constraints">
+      <h2>1. 理论约束：先定义可用传输外包络</h2>
+
+      <h3>1.1 BDAV MPEG-2 Transport Stream 是 MUX 约束的实际对象</h3>
+      <p>UHD Blu-ray 的片流不是只看 HEVC elementary stream 的峰值，而是把视频、音频、图形字幕、菜单图形等 elementary streams 封装到 BDAV MPEG-2 Transport Stream 中。BDA 白皮书描述了 BDAV MPEG-2 TS 的 192-byte source packet、6144-byte aligned unit 结构，并给出不同 disc type 与 zone 对应的最大复用速率。这个速率才是 Scenarist UHD MUX 判断读缓冲安全性的外侧边界。</p>
+
+      <table>
+        <thead>
+          <tr><th>碟片类型</th><th>可用容量与区域</th><th>采用的 M2TS 上限</th><th>工程用途</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>BD-ROM 100GB (122.546 Mbps)</td><td>95,466.00 MB</td><td>109 Mbps</td><td>MEL 单碟发行版。容量是主要优势。</td></tr>
+          <tr><td>BD-ROM 66GB (two-zoned disc)</td><td>58,552.48 MB</td><td>127.9 Mbps</td><td>FEL 三碟测试版。HTR 传输速率是主要优势。</td></tr>
+          <tr><td>BD-ROM 100GB (two-zoned disc)</td><td>87,828.72 MB</td><td>127.9 Mbps</td><td>理论上可同时获得大容量与高 HTR 速率，但会受 HTR 文件分配规则和容量折损约束。</td></tr>
+        </tbody>
+      </table>
+
+      <h3>1.2 HEVC 主视频仍受 100 Mbps 级别约束</h3>
+      <p>BDA 白皮书的 Primary Video 表给出 UHD BD HEVC Main 10、High Tier、Level 5.1 的 3840×2160、59.94p 支持，并列出 HEVC primary video 的最大码率为 100 Mbps。因此，BL、MEL、FEL 的 <code>maxRate</code> 设计不能只满足 M2TS 外包络，还必须满足单层或分层后的 elementary stream 上限。</p>
+
+      <h3>1.3 Dolby Vision Profile 7 的 BL/EL 分配原则</h3>
+      <p>Dolby Vision UHD Blu-ray Profile 7 是双层编码：BL 是 HDR10 兼容的 10-bit full-picture layer，EL 携带残差和动态元数据。MEL 的残差信号为零或最小化，FEL 的残差信号非零，可用于更完整地重建 12-bit 高峰值母版信息。Dolby 工作流指南给出的经验区间是：MEL 使用 98/2 到 99.5/0.5 的 BL/EL 比例；FEL 使用 80/20 到 95/5 的 BL/EL 比例。你的计算器把这些比例转化为可验证的整数 Kbps 参数。</p>
+
+      <div class="note small"><strong>注：</strong>Dolby 指南同时指出，对于 50 fps 或更高 UHD 内容，在某些映射工作流下推荐或要求使用 MEL 以提升处理效率。因此，本文把 59.94p FEL 方案定位为“工程测试版/压力测试版”，而 MEL 方案定位为更稳妥的单碟发行配置。</div>
+    </section>
+
+    <section id="vbv-model">
+      <h2>2. VBV 安全模型：把 M2TS 预算转化为编码器参数</h2>
+      <p>你的 RateRules 把 MUX 可用视频预算抽象为 <code>VBV_safeRate</code>。它不是编码器的瞬时峰值，而是对 M2TS 读缓冲更友好的安全预算。核心模型如下：</p>
+      <div class="formula">
+        <p><code>VBV_maxRate = 0.9 × VBV_safeRate</code></p>
+        <p><code>VBV_bufferSize = 1/3 × VBV_maxRate</code></p>
+        <p><code>VBV_peakRate = VBV_maxRate + VBV_bufferSize</code></p>
+        <p><code>VBV_peakRate + 2 × VBV_maxRate = 3 × VBV_safeRate</code></p>
+      </div>
+      <p>当 <code>VBV_safeRate = 96 Mbps</code> 时：</p>
+      <table>
+        <thead><tr><th>总视频参数</th><th>数值</th><th>作用</th></tr></thead>
+        <tbody>
+          <tr><td><code>VBV_safeRate</code></td><td>96,000 Kbps</td><td>与音频最大占用相加后用于 M2TS 安全校验。</td></tr>
+          <tr><td><code>VBV_maxRate</code></td><td>86,400 Kbps</td><td>编码器 VBV 最大数据率。</td></tr>
+          <tr><td><code>VBV_bufferSize</code></td><td>28,800 Kbps</td><td>缓冲裕量；用于吸收瞬态复杂度。</td></tr>
+          <tr><td><code>VBV_peakRate</code></td><td>115,200 Kbps</td><td>理论瞬时峰值，不直接等同于 M2TS 预算。</td></tr>
+        </tbody>
+      </table>
+      <p>这个模型的工程意义是：<strong>编码器可以有瞬态复杂度吸收能力，但 MUX 的连续读出压力仍按 96 Mbps 安全视频预算设计</strong>。这正是避免 Scenarist UHD MUX <code>buffer_underflows</code> 的关键。</p>
+    </section>
+
+    <section id="workflow">
+      <h2>3. 工程化优化流程：理论研究 + 多次实验 → 生产实践</h2>
+      <ol>
+        <li><strong>确定碟片外包络。</strong>先选 disc type 与 zone，得到容量上限和 <code>M2TS_maxRate</code>。普通 100GB 取 109 Mbps；<span class="keep">two-zoned 66GB 与 100GB</span> 的 HTR 区可取 127.9 Mbps。</li>
+        <li><strong>音频先行。</strong>把所有随主片复用的音频轨按最大码率求和。TrueHD、DTS-HD MA 这类 VBR 音轨使用实测最大值，不用平均值。PGS 字幕和图形流若码率显著，也应纳入保守预算。</li>
+        <li><strong>反推出视频安全预算。</strong><code>Video_safeRate ≤ M2TS_maxRate − Audio_maxRate − Guard</code>。你的两个方案都把 <code>Video_safeRate</code> 收敛到 96 Mbps。</li>
+        <li><strong>套用 VBV 模型。</strong>由 96 Mbps 得到总 <code>max_vbv_data_rate = 86.4 Mbps</code>、总 <code>vbv_buffer_size = 28.8 Mbps</code>。</li>
+        <li><strong>按 Dolby Vision 层类型分配 BL/EL。</strong>MEL 使用 99.5/0.5，使绝大部分码率进入 BL；FEL 使用 95/5，使 EL 保留必要残差预算，同时避免 BL 超过 100 Mbps 上限。</li>
+        <li><strong>用容量决定平均 <code>data_rate</code>。</strong>MEL 单碟以容量压满为目标，平均视频为 72 Mbps；FEL 三碟测试版以传输压力与 FEL 实验为目标，平均视频可设到 86.4 Mbps。</li>
+        <li><strong>反复 MUX 验证。</strong>每轮都用实际编码流进入 Scenarist UHD MUX，检查 <code>buffer_underflows</code>、M2TS 校验码率、Clip/Playlist 播放和实机兼容；只把通过 MUX 的参数固化为生产规则。</li>
+      </ol>
+    </section>
+
+    <section id="audio-streams">
+      <h2>4. 音频流信息与复用预算</h2>
+      <p>音频预算按“参与主片 <span class="term">M2TS</span> 复用的音频流最大码率”计算。VBR 轨道使用编码后的最大值，CBR 轨道使用恒定码率；这样得到的总和用于与视频 <code>VBV_safeRate</code> 相加，形成 <span class="term">Scenarist UHD MUX</span> 的校验压力。</p>
+
+      <h3>4.1 MEL 单碟发行版音频流</h3>
+      <table class="audio-table">
+        <colgroup>
+          <col class="stream">
+          <col class="config">
+          <col class="rate">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>音频流</th>
+            <th>配置与用途</th>
+            <th>码率与复用处理</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Dolby TrueHD with Dolby Atmos</td>
+            <td>7.1.4 对象音频，兼容 7.1 布局；该 <span class="term">TrueHD Atmos</span> 流内包含基于 <span class="term">MixConvert V6</span> 的 2.0 <span class="term">independent presentation</span>，不是额外独立复用的立体声轨。</td>
+            <td>最大 6,375 Kbps；作为主无损沉浸声轨计入最大音频复用预算。</td>
+          </tr>
+          <tr>
+            <td>Dolby Digital core</td>
+            <td>5.1 声道，不带 EX；作为 <span class="term">TrueHD</span> 兼容内核存在。</td>
+            <td>恒定 384 Kbps；随 <span class="term">TrueHD</span> 兼容结构计入预算。</td>
+          </tr>
+          <tr>
+            <td>Dolby Digital Plus with Dolby Atmos</td>
+            <td>7.1.4 对象音频，兼容 7.1 布局；<span class="keep">5.1 内核 / 7.1 声道</span>。</td>
+            <td>恒定 1,152 Kbps；作为流媒体兼容型 Atmos 轨计入预算。</td>
+          </tr>
+          <tr>
+            <td>DTS-HD Master Audio 2.0</td>
+            <td>基于 <span class="term">Dolby Binaural</span> 的<span class="keep">杜比双耳音频呈现版本</span>。</td>
+            <td>最大 2,547 Kbps；作为独立音频流计入预算。</td>
+          </tr>
+          <tr>
+            <td>DTS-HD Master Audio 2.0</td>
+            <td>基于 <span class="term">Apple Spatial Audio</span> 的<span class="keep">苹果空间音频派生版本</span>。</td>
+            <td>最大 2,511 Kbps；作为独立音频流计入预算。</td>
+          </tr>
+          <tr>
+            <td><strong>最大音频复用预算</strong></td>
+            <td>以上已采用音频流的最大码率求和。</td>
+            <td><strong>12,969 Kbps</strong>；与 96,000 Kbps 视频安全预算相加后，M2TS 校验压力为 108,969 Kbps。</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>4.2 FEL 三碟测试版音频流</h3>
+      <table class="audio-table">
+        <colgroup>
+          <col class="stream">
+          <col class="config">
+          <col class="rate">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>音频流</th>
+            <th>配置与用途</th>
+            <th>码率与复用处理</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Dolby TrueHD with Dolby Atmos</td>
+            <td>7.1.4 对象音频，兼容 7.1 布局；关闭比特率优化，用于测试高峰值压力。</td>
+            <td>最大 7,446 Kbps；作为主无损沉浸声轨计入预算。</td>
+          </tr>
+          <tr>
+            <td>Dolby Digital core</td>
+            <td>5.1 声道，不带 EX；作为 <span class="term">TrueHD</span> 兼容内核存在。</td>
+            <td>恒定 640 Kbps；随 <span class="term">TrueHD</span> 兼容结构计入预算。</td>
+          </tr>
+          <tr>
+            <td>Dolby Digital Plus with Dolby Atmos</td>
+            <td>7.1.4 对象音频，兼容 7.1 布局；<span class="keep">5.1 内核 / 7.1 声道</span>。</td>
+            <td>恒定 1,664 Kbps；作为 DD+ Atmos 版本计入预算。</td>
+          </tr>
+          <tr>
+            <td>Dolby Digital Plus</td>
+            <td><span class="term">Dolby Surround EX</span>；<span class="keep">5.1 内核 / 7.1 声道</span>。</td>
+            <td>恒定 1,664 Kbps；作为 EX 兼容版本计入预算。</td>
+          </tr>
+          <tr>
+            <td>DTS-HD Master Audio 7.1</td>
+            <td>兼容 <span class="term">Lo/Ro 5.1/2.0</span>。</td>
+            <td>最大 6,852 Kbps；作为高码率多声道版本计入预算。</td>
+          </tr>
+          <tr>
+            <td>DTS-HD Master Audio 5.1</td>
+            <td>兼容 <span class="term">Lo/Ro</span> 立体声。</td>
+            <td>最大 5,355 Kbps；作为 5.1 兼容版本计入预算。</td>
+          </tr>
+          <tr>
+            <td>DTS-HD Master Audio 2.0</td>
+            <td>基于 <span class="term">MixConvert V6</span> 的常规立体声派生版本。</td>
+            <td>最大 2,553 Kbps；作为独立音频流计入预算。</td>
+          </tr>
+          <tr>
+            <td>DTS-HD Master Audio 2.0</td>
+            <td>基于 <span class="term">Dolby Binaural</span> 的<span class="keep">杜比双耳音频呈现版本</span>。</td>
+            <td>最大 2,547 Kbps；作为独立音频流计入预算。</td>
+          </tr>
+          <tr>
+            <td>DTS-HD Master Audio 2.0</td>
+            <td>基于 <span class="term">Apple Spatial Audio</span> 的<span class="keep">苹果空间音频派生版本</span>。</td>
+            <td>最大 2,511 Kbps；作为独立音频流计入预算。</td>
+          </tr>
+          <tr>
+            <td><strong>最大音频复用预算</strong></td>
+            <td>以上已采用音频流的最大码率求和。</td>
+            <td><strong>31,232 Kbps</strong>；与 96,000 Kbps 视频安全预算相加后，M2TS 校验压力为 127,232 Kbps。</td>
+          </tr>
+        </tbody>
+      </table>
+      <p class="table-note">FEL 测试版中“开启比特率优化”的 <span class="keep">TrueHD Atmos / Dolby Digital</span> 组合属于备选测试项，不计入最终 31,232 Kbps 复用预算。最终预算只按已采用的音频流求和。</p>
+    </section>
+
+    <section id="mel-case">
+      <h2>5. 案例 A：MEL 单碟发行版</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>目标</h3>
+          <p>在 <span class="keep">BD-ROM 100GB、109 Mbps</span> M2TS 上限内，尽量压满单碟容量，同时保持 Scenarist UHD MUX 不报 <code>buffer_underflows</code>。</p>
+        </div>
+        <div class="card">
+          <h3>工程判断</h3>
+          <p>MEL 的 EL 负担极小，适合把码率集中到 BL；音频轨数量相对克制，因此可用 100GB 单碟容量完成发行版。</p>
+        </div>
+      </div>
+
+      <table>
+        <thead><tr><th>项目</th><th>数值</th><th>解释</th></tr></thead>
+        <tbody>
+          <tr><td>碟片</td><td>BD-ROM 100GB (122.546 Mbps) ×1</td><td>有效容量 95,466.00 MB；M2TS 上限 109 Mbps。</td></tr>
+          <tr><td>音频流最大比特率</td><td>12.969 Mbps</td><td>TrueHD Atmos、DD+ Atmos、DTS-HD MA 2.0 等全部复用音频的最大占用。</td></tr>
+          <tr><td>视频安全比特率</td><td>96.000 Mbps</td><td>由 109 − 12.969 ≈ 96.031 Mbps 反推出，取整数 96 Mbps。</td></tr>
+          <tr><td>M2TS 校验比特率</td><td>108.969 Mbps</td><td>音频最大 + 视频安全 = 108.969 Mbps。</td></tr>
+          <tr><td>对 109 Mbps 的余量</td><td>31 Kbps</td><td><span class="warn">极窄余量</span>，必须依赖保守 VBV 和实际 MUX 验证。</td></tr>
+          <tr><td>容量利用</td><td>94,673.04 / 95,466.00 MB = 99.17%</td><td>剩余 792.96 MB，接近单碟容量上限。</td></tr>
+        </tbody>
+      </table>
+
+      <h3>最终编码参数</h3>
+      <pre>data_rate         = 71640 (BL),   360 (MEL)  # total 72,000 Kbps
+max_vbv_data_rate = 85968 (BL),   432 (MEL)  # total 86,400 Kbps
+vbv_buffer_size   = 28656 (BL),   144 (MEL)  # total 28,800 Kbps
+BL/MEL ratio      = 99.5% / 0.5%</pre>
+
+      <p>该配置的核心是<strong>容量优先、M2TS 临界控制</strong>。平均视频 72 Mbps 使单碟容量利用率达到 99.17%；而总 <code>max_vbv_data_rate</code> 仍限制在 86.4 Mbps，避免把短时复杂度直接推成 MUX 读出压力。MEL 只给 0.5% 的码率，是因为 MEL 不承担有效残差重建任务，主要服务 Dolby Vision 元数据与最低增强层结构。</p>
+    </section>
+
+    <section id="fel-case">
+      <h2>6. 案例 B：FEL 三碟测试版</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>目标</h3>
+          <p>验证 FEL + 大量音频轨 + 59.94p UHD 的高压力组合，在 two-zoned 66GB HTR 速率下是否可稳定 MUX。</p>
+        </div>
+        <div class="card">
+          <h3>工程判断</h3>
+          <p>FEL 与多音轨显著抬高传输预算，普通 109 Mbps 外包络不足；使用 127.9 Mbps HTR zone，并通过三碟拆分解除容量压力。</p>
+        </div>
+      </div>
+
+      <table>
+        <thead><tr><th>项目</th><th>数值</th><th>解释</th></tr></thead>
+        <tbody>
+          <tr><td>碟片</td><td>BD-ROM 66GB two-zoned disc ×3</td><td>单碟有效容量 58,552.48 MB；HTR M2TS 上限 127.9 Mbps。</td></tr>
+          <tr><td>音频流最大比特率</td><td>31.232 Mbps</td><td>包含 TrueHD Atmos、DD+ Atmos、DD+ 7.1 EX、DTS-HD MA 7.1/5.1/2.0 等多音轨。</td></tr>
+          <tr><td>视频安全比特率</td><td>96.000 Mbps</td><td>由 127.9 − 31.232 = 96.668 Mbps 反推出，保守取 96 Mbps。</td></tr>
+          <tr><td>M2TS 校验比特率</td><td>127.232 Mbps</td><td>音频最大 + 视频安全 = 127.232 Mbps。</td></tr>
+          <tr><td>对 127.9 Mbps 的余量</td><td>668 Kbps</td><td>比 MEL 单碟宽，但仍需要 Scenarist UHD MUX 实测确认。</td></tr>
+          <tr><td>容量利用</td><td>47,633.54 / 58,552.48 MB = 81.35%</td><td>剩余 10,918.94 MB；三碟方案主要服务传输压力与实验弹性。</td></tr>
+        </tbody>
+      </table>
+
+      <h3>最终编码参数</h3>
+      <pre>data_rate         = 82080 (BL),  4320 (FEL)  # total 86,400 Kbps
+max_vbv_data_rate = 82080 (BL),  4320 (FEL)  # total 86,400 Kbps
+vbv_buffer_size   = 27360 (BL),  1440 (FEL)  # total 28,800 Kbps
+BL/FEL ratio      = 95% / 5%</pre>
+
+      <p>该配置的核心是<strong>传输速率优先、容量由分碟解决</strong>。FEL 残差层比 MEL 更有意义，不能把 EL 压到 0.5%；因此取 95/5，把 FEL 层维持在 4.32 Mbps，同时 BL 维持 82.08 Mbps，二者均低于 100 Mbps 约束。由于音频最大占用高达 31.232 Mbps，只有 two-zoned disc 的 127.9 Mbps HTR 外包络能给 96 Mbps 视频安全预算留下足够空间。</p>
+    </section>
+
+    <section id="practice-rules">
+      <h2>7. 可复用的生产实践规则</h2>
+      <table class="rules-table">
+        <thead><tr><th class="rule">规则</th><th class="method">执行方式</th><th class="reason">目的</th></tr></thead>
+        <tbody>
+          <tr><td>先算 M2TS，再算视频</td><td><code>Video_safeRate = M2TS_maxRate − Audio_maxRate − Guard</code></td><td>避免把视频参数孤立优化后在 MUX 阶段失败。</td></tr>
+          <tr><td>音频用最大值，不用平均值</td><td><span class="keep">TrueHD Atmos、DTS-HD MA</span> 取编码后的最大码率；<span class="keep">Dolby Digital、Dolby Digital Plus CBR</span> 取恒定码率。</td><td>Scenarist 的读缓冲风险来自峰值复用压力。</td></tr>
+          <tr><td>固定 96 Mbps 视频安全档</td><td>在 109 Mbps 和 127.9 Mbps 两类外包络下统一使用 96 Mbps。</td><td>形成跨方案可复用的 VBV 参数档。</td></tr>
+          <tr><td>总 <code>max_vbv</code> 固定 86.4 Mbps</td><td>按 <code>0.9 × 96 Mbps</code> 设置。</td><td>给 MUX 和解码器 HRD 留出调度空间。</td></tr>
+          <tr><td>MEL 以 BL 为主</td><td>优先 99.5/0.5；必要时回退到 99/1、98.5/1.5 或 98/2。</td><td>把码率用于可直接改善 HDR10 BL 的画质。</td></tr>
+          <tr><td>FEL 保留残差预算</td><td>在 80/20 到 95/5 内选择满足 BL ≤ 100 Mbps 的最高 BL 比例。</td><td>兼顾 FEL 残差信息和 BL 上限。</td></tr>
+          <tr><td>容量和速率分开优化</td><td>100GB MEL 单碟解决容量；66GB two-zoned FEL 多碟解决传输峰值。</td><td>避免把“容量够”和“M2TS 不欠载”混为一谈。</td></tr>
+          <tr><td>最终以 MUX 实验为准</td><td><span class="keep">音频、字幕、章节拆分、码率或</span> <span class="keep">BL/EL 比例变更后，</span><span class="keep">均重新进入 Scenarist UHD MUX 校验。</span></td><td>把理论模型变成生产可交付参数。</td></tr>
+        </tbody>
+      </table>
+
+      <h3>建议的参数档模板</h3>
+      <pre># Universal 96 Mbps video-safe profile
+VBV_safeRate      = 96,000 Kbps
+VBV_maxRate       = 86,400 Kbps
+VBV_bufferSize    = 28,800 Kbps
+VBV_peakRate      = 115,200 Kbps
+
+# MEL production profile
+BL_MEL_ratio      = 99.5 / 0.5
+BL max/buffer     = 85,968 / 28,656 Kbps
+MEL max/buffer    =    432 /    144 Kbps
+
+# FEL stress-test profile
+BL_FEL_ratio      = 95 / 5
+BL max/buffer     = 82,080 / 27,360 Kbps
+FEL max/buffer    =  4,320 /  1,440 Kbps</pre>
+    </section>
+
+    <section id="qc">
+      <h2>8. 验证与 QC 清单</h2>
+      <h3>8.1 编码前</h3>
+      <ul>
+        <li>核对母版元数据：P3-D65 within BT.2020 container、PQ ST 2084、ST 2086、MaxCLL、MaxFALL、mastering display luminance。</li>
+        <li>核对 Dolby Vision RPU：L0 mastering monitor、L1 shot metadata、L5 active area、L6 MaxCLL 与 MaxFALL。</li>
+        <li>确认 59.94p UHD 内容在目标工具链中对 MEL/FEL 的支持边界；FEL 59.94p 应按测试版处理。</li>
+      </ul>
+
+      <h3>8.2 编码后</h3>
+      <ul>
+        <li>用 Dolby Vision Bitstream Verifier 与 Blu-ray Verifier 检查 BL、EL、RPU 的语法和元数据一致性。</li>
+        <li>核对 BL/EL 帧同步。EL 不同步通常表现为重影；元数据不同步通常表现为镜头中间的异常亮度跳变。</li>
+        <li>抽查 HDR10 BL 画质，避免为 Dolby Vision 层牺牲非 Dolby Vision 播放兼容体验。</li>
+      </ul>
+
+      <h3>8.3 Scenarist UHD MUX</h3>
+      <ul>
+        <li>使用实际 encoded elementary streams，而不是估算码率文件。</li>
+        <li>检查 <code>buffer_underflows</code>、M2TS check-rate、clip duration、playlist、章节点、seamless connection。</li>
+        <li>若出现 underflow，优先按顺序处理：降低 <code>Video_safeRate</code> → 降低平均 <code>data_rate</code> → 降低音频峰值或减少音轨 → 调整分碟或改用 two-zoned disc。</li>
+      </ul>
+
+      <h3>8.4 实机播放</h3>
+      <ul>
+        <li>分别测试 Dolby Vision 输出、HDR10 fallback、无 Dolby Vision 设备播放。</li>
+        <li>测试 PGS 繁简字幕在 600 cd/m² CLUT 下的亮度、边缘和闪烁。</li>
+        <li>如果有大面积菜单图形，按 Dolby 建议验证 Graphics Priority mode；仅字幕一般不应触发 graphics priority。</li>
+      </ul>
+    </section>
+
+    <section id="references">
+      <h2>9. 参考文献</h2>
+      <ol>
+        <li><strong>Blu-ray Disc Association.</strong> <em>White Paper: Blu-ray Disc Read-Only Format (Ultra HD Blu-ray), Audio Visual Application Format Specifications for BD-ROM Version 3.1.</em> August 2016. 本文引用其 BDAV MPEG-2 TS 结构、Table 2-1 最大 MPEG-2 transport stream bitrate、Table 2-3 HEVC primary video 规格。</li>
+        <li><strong>Dolby Laboratories.</strong> <em>Dolby Vision UHD Blu-ray Authoring Workflow Guide, Version 1.1.</em> September 9, 2019. 本文引用其 Profile 7 BL/EL 定义、MEL/FEL 说明、BL/EL 码率比例建议、metadata and bitstream verification 和 QC 建议。</li>
+        <li><strong>Internal engineering note.</strong> <em>RateRules_v3.0.txt.</em> 本文引用其碟片容量与 M2TS 上限、VBV 安全模型、BL/EL 比例和 100,000 Kbps 层级约束。</li>
+        <li><strong>Internal experiment log.</strong> <em>CalcLogs_v3.1.txt.</em> 本文引用其 96 Mbps MEL 与 FEL 计算结果，以及过高 safeRate 自动回退实验。</li>
+        <li><strong>Supplementary online link.</strong> Blu-ray Disc Association FAQ and technical white paper portal: <a href="https://blu-raydisc.info/format-spec/faq-info.php">blu-raydisc.info format specification FAQ</a>.</li>
+        <li><strong>Supplementary online link.</strong> Dolby Vision for Content Creators: <a href="https://professional.dolby.com/content-creation/dolby-vision-for-content-creators/">professional.dolby.com Dolby Vision for Content Creators</a>.</li>
+        <li><strong>Supplementary online link.</strong> Dolby Vision Verification Toolkit URL cited by the Dolby workflow guide: <a href="https://developer.dolby.com/dolby-professional/professional-products/dolby-vision-verification-toolkit/">Dolby Vision Verification Toolkit</a>.</li>
+      </ol>
+    </section>
+
+    <div class="footer">
+      <p>本文是面向 authoring/encoding 工程实践的参数优化说明，不替代 BDA 与 Dolby 的正式授权规范与测试认证。所有生产交付仍应以合法授权文档、Scenarist UHD MUX 日志、Dolby Verifier、BD Verifier 和实机兼容性测试结果为准。</p>
+    </div>
+  </main>
+</body>
+</html>

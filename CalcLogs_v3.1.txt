@@ -1,0 +1,79 @@
+==============================================
+杜比视界® Profile 7 VBV 参数计算器 (MEL / FEL)
+输入 VBV_safeRate (整数 Mbps) 并选择增强层类型
+==============================================
+
+请输入 VBV_safeRate (整数 Mbps): 96
+请选择增强层类型 (MEL / FEL): MEL
+
+===== 计算结果 (MEL) =====
+VBV_safeRate = 96 Mbps
+BL_maxRate   = 85968 Kbps
+BL_buffSize  = 28656 Kbps
+MEL_maxRate  = 432 Kbps
+MEL_buffSize = 144 Kbps
+BL_MEL_ratio = 99.5%, 0.5%
+==========================
+
+Press any key to continue . . .
+
+==============================================
+杜比视界® Profile 7 VBV 参数计算器 (MEL / FEL)
+输入 VBV_safeRate (整数 Mbps) 并选择增强层类型
+==============================================
+
+请输入 VBV_safeRate (整数 Mbps): 96
+请选择增强层类型 (MEL / FEL): FEL
+
+===== 计算结果 (FEL) =====
+VBV_safeRate = 96 Mbps
+BL_maxRate   = 82080 Kbps
+BL_buffSize  = 27360 Kbps
+FEL_maxRate  = 4320 Kbps
+FEL_buffSize = 1440 Kbps
+BL_FEL_ratio = 95%, 5%
+==========================
+
+Press any key to continue . . .
+
+==============================================
+杜比视界® Profile 7 VBV 参数计算器 (MEL / FEL)
+输入 VBV_safeRate (整数 Mbps) 并选择增强层类型
+==============================================
+
+请输入 VBV_safeRate (整数 Mbps): 500
+请选择增强层类型 (MEL / FEL): MEL
+
+注意：500 Mbps 无满足约束的组合，已自动降低至 112 Mbps。
+
+===== 计算结果 (MEL) =====
+VBV_safeRate = 112 Mbps
+BL_maxRate   = 99792 Kbps
+BL_buffSize  = 33264 Kbps
+MEL_maxRate  = 1008 Kbps
+MEL_buffSize = 336 Kbps
+BL_MEL_ratio = 99%, 1%
+==========================
+
+Press any key to continue . . .
+
+==============================================
+杜比视界® Profile 7 VBV 参数计算器 (MEL / FEL)
+输入 VBV_safeRate (整数 Mbps) 并选择增强层类型
+==============================================
+
+请输入 VBV_safeRate (整数 Mbps): 500
+请选择增强层类型 (MEL / FEL): FEL
+
+注意：500 Mbps 无满足约束的组合，已自动降低至 138 Mbps。
+
+===== 计算结果 (FEL) =====
+VBV_safeRate = 138 Mbps
+BL_maxRate   = 99360 Kbps
+BL_buffSize  = 33120 Kbps
+FEL_maxRate  = 24840 Kbps
+FEL_buffSize = 8280 Kbps
+BL_FEL_ratio = 80%, 20%
+==========================
+
+Press any key to continue . . .
